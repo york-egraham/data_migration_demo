@@ -1,0 +1,28 @@
+services:
+  neo4j:
+    image: neo4j:latest
+    container_name: neo4j_container
+    ports:
+      - "7474:7474"  # Web Interface
+      - "7687:7687"  # Bolt Protocol
+    environment:
+      NEO4J_AUTH: neo4j/password  # Default username: neo4j, password: password
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+      - neo4j_conf:/var/lib/neo4j/conf
+
+  oracleXe:
+    image: container-registry.oracle.com/database/express:21.3.0-xe
+    container_name: oracle_xe
+    ports:
+      - "5433:1521" # (Oracle Listener)
+      - "5500:5500" # (EM Express)
+    environment:
+      ORACLE_PWD: oracle # password
+    volumes:
+      - ./startup_scripts:/docker-entrypoint-initdb.d/startup
+volumes:
+  neo4j_data:
+  neo4j_logs:
+  neo4j_conf:
