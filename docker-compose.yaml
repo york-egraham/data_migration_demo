@@ -22,7 +22,23 @@ services:
       ORACLE_PWD: oracle # password
     volumes:
       - ./startup_scripts:/docker-entrypoint-initdb.d/startup
+
+  postgres:
+    image: postgres:17
+    container_name: postgres_container
+    restart: always
+    environment:
+      # Setting access credentials
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5000:5432"  # Host Port Changed to 5000, prevents conflict with PgAdmin
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
 volumes:
   neo4j_data:
   neo4j_logs:
   neo4j_conf:
+  postgres_data:
