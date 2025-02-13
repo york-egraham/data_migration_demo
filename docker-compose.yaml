@@ -13,7 +13,7 @@ services:
       - neo4j_conf:/var/lib/neo4j/conf
 
   postgres:
-    image: postgres:17
+    image: postgres:13
     container_name: postgres_container
     restart: always
     environment:
