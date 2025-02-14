@@ -14,8 +14,76 @@ psql -h localhost -p 5000 -U postgres -d mydatabase -f .\postgres\schema.sql
 right-click on mydatabase > select 'Query Tool' > Upload your schema script with Ctrl+o to select the file > execute the script with F5
 ```
 
-<hr>
+## Seed Sample Data
+```bash
+# Command Line
+psql -h localhost -p 5000 -U postgres -d mydatabase -f .\postgres\seed_data.sql
 
+# PgAdmin
+right-click on mydatabase > select 'Query Tool' > Upload your script with Ctrl+o to select the file > execute the script with F5
+```
+
+## Backing up the Database
+```bash
+# Command Line
+pg_dump -U postgres -p 5000 mydatabase > ./postgres/backup.sql
+
+# PgAdmin
+right-click on mydatabase > select "Backup..." > Create Name > select "Backup" button.
+```
+
+## Restoring the Database
+```bash
+# Command Line
+psql -U postgres -p 5000 -d mydatabase -f ./postgres/backup.sql
+
+# PgAdmin
+right-click on mydatabase > select "Restore..." > select your backup file.
+```
+
+# Sample Queries
+
+### Grab all emails from a specific sender (user 1) and display the content and recipient details. 
+`Note` This uses inner joins so only matches between tables are shown.
+```sql
+SELECT 
+    e.id AS email_id,
+    e.subject,
+    e.body,
+    e.sent_date,
+    er.recipient_type,
+    r.id AS recipient_id,
+    r.name AS recipient_name,
+    r.email AS recipient_email
+FROM emails e
+JOIN email_recipients er 
+    ON e.id = er.email_id
+JOIN users r 
+    ON er.user_id = r.id
+WHERE e.from_user_id = 1;
+```
+
+### Determine the number of average emails sent by each age group
+```sql
+WITH user_email_counts AS (
+    SELECT 
+        u.id,
+        u.age,
+        COUNT(e.id) AS email_count
+    FROM users u
+    LEFT JOIN emails e 
+        ON u.id = e.from_user_id
+    GROUP BY u.id, u.age
+)
+SELECT 
+    age,
+    COUNT(*) AS user_count,
+    SUM(email_count) AS total_emails,
+    AVG(email_count) AS avg_emails_per_user
+FROM user_email_counts
+GROUP BY age
+ORDER BY age;
+```
 
 # Reference Section
 ## List of common psql commands
